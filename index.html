@@ -1,101 +1,118 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بث مباشر | عبود #هاشتاج_شاهد</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>بث مباشر | عبود #هاشتاق_شاهد</title>
     
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dplayer/dist/DPlayer.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dplayer/dist/DPlayer.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
 
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #0b0b0b; font-family: sans-serif;
+            background: radial-gradient(circle, #1a1a1a 0%, #000000 100%);
+            font-family: 'Cairo', sans-serif;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden;
         }
 
-        /* اسمك والهاشتاج فوق */
-        .header {
-            margin-bottom: 15px; text-align: center;
+        /* الهيدر العلوي - الحقوق */
+        .branding-header {
+            text-align: center; margin-bottom: 20px;
         }
-        .header h1 {
-            color: #00bfff; font-size: 24px; margin: 0;
-            text-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
-        }
-        .header span { color: white; }
 
-        /* حاوية الفيديو في المنتصف */
-        .video-box {
-            width: 95%; max-width: 850px;
+        .branding-header h1 {
+            font-size: 28px; font-weight: 900; margin: 0;
+            color: #fff; text-shadow: 0 0 15px rgba(0, 191, 255, 0.7);
+        }
+
+        .branding-header h1 span {
+            color: #00bfff;
+        }
+
+        .match-card {
+            background: #ff0000; color: white; padding: 5px 20px;
+            border-radius: 50px; font-weight: bold; font-size: 16px;
+            margin-top: 10px; display: inline-block; animation: blink 1.5s infinite;
+        }
+
+        /* حاوية المشغل في المنتصف */
+        .player-container {
+            width: 95%; max-width: 900px;
             aspect-ratio: 16 / 9;
             background: #000;
-            border: 2px solid #00bfff;
-            border-radius: 10px;
+            border: 4px solid #333;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 191, 255, 0.2);
             position: relative;
         }
 
-        video { width: 100%; height: 100%; display: block; }
+        #dplayer { width: 100%; height: 100%; }
 
-        /* زر تشغيل كبير في حال توقف */
-        #play-btn {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 191, 255, 0.8);
-            color: white; border: none; padding: 15px 30px;
-            font-size: 18px; border-radius: 50px; cursor: pointer;
-            z-index: 100; display: none;
+        /* حقوق إضافية بالأسفل */
+        .footer-rights {
+            margin-top: 20px; color: #666; font-size: 14px; font-weight: bold;
+        }
+
+        @keyframes blink { 0% {opacity:1} 50% {opacity:0.5} 100% {opacity:1} }
+
+        @media (max-width: 768px) {
+            .branding-header h1 { font-size: 22px; }
+            .player-container { width: 98%; border-width: 2px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>عبود <span>#هاشتاج_شاهد</span></h1>
-        <p style="color: #ff0000; font-weight: bold; margin-top: 5px;">مباشر: ريال مدريد × مانشستر سيتي</p>
+    <div class="branding-header">
+        <h1>عبود <span>#هاشتاق_شاهد</span></h1>
+        <div class="match-card">ريال مدريد 🆚 مانشستر سيتي - مباشر</div>
     </div>
 
-    <div class="video-box">
-        <button id="play-btn" onclick="forcePlay()">اضغط لتشغيل البث</button>
-        <video id="video" controls autoplay muted playsinline></video>
+    <div class="player-container">
+        <div id="dplayer"></div>
     </div>
 
-    <p style="color: #888; margin-top: 15px; font-size: 14px;">إذا لم يعمل البث، تأكد من تحديث الصفحة أو أن الرابط لا يزال صالحاً</p>
+    <div class="footer-rights">
+        DESIGNED BY: <span style="color:#00bfff">ABOOD</span>
+    </div>
 
     <script>
-        const video = document.getElementById('video');
-        const playBtn = document.getElementById('play-btn');
-        // الرابط الذي أرسلته
-        const streamUrl = 'http://wjk30.tutor3.site/live/51838_.m3u8?session=fgXV65Um2lfy1XM-PnwCNI6JKBGv-7c8uR6nyqvK0yPD6645oYewQjFQ6kFRCCFO8v9weMjgiE5rg7pCM4ODC3gY8vmYU53y&location=local';
+        // الرابط الجديد بصيغة HTTPS
+        const streamUrl = 'https://wjk30.tutor3.site/live/51838_.m3u8?session=fgXV65Um2lfy1XM-PnwCNI6JKBGv-7c8uR6nyqvK0yPD6645oYewQjFQ6kFRCCFO8v9weMjgiE5rg7pCM4ODC3gY8vmYU53y&location=local';
 
-        if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(streamUrl);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play().catch(() => {
-                    // إذا منع المتصفح التشغيل التلقائي، نظهر الزر
-                    playBtn.style.display = 'block';
-                });
-            });
-            
-            // في حال فشل الرابط
-            hls.on(Hls.Events.ERROR, function (event, data) {
-                if (data.fatal) {
-                    console.log("الرابط قد يكون متوقفاً من المصدر");
+        const dp = new DPlayer({
+            container: document.getElementById('dplayer'),
+            live: true,
+            autoplay: true,
+            theme: '#00bfff',
+            lang: 'ar',
+            screenshot: true,
+            video: {
+                url: streamUrl,
+                type: 'hls'
+            }
+        });
+
+        // محاولة التشغيل التلقائي (المتصفح قد يطلب كتم الصوت أولاً)
+        dp.on('canplay', function () {
+            dp.play();
+        });
+
+        // إذا لم يعمل تلقائياً بسبب سياسة المتصفح
+        window.onload = function() {
+            setTimeout(() => {
+                if (dp.video.paused) {
+                    dp.video.muted = true;
+                    dp.play();
                 }
-            });
-        } 
-        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = streamUrl;
-        }
-
-        function forcePlay() {
-            video.play();
-            video.muted = false; // تشغيل الصوت عند الضغط
-            playBtn.style.display = 'none';
-        }
+            }, 1000);
+        };
     </script>
+
 </body>
 </html>
