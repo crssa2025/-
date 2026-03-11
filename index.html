@@ -3,69 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بث مباشر | عبود #هاشتاق_شاهد</title>
+    <title>بث مباشر | عبود #هاشتاج_شاهد</title>
     
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
 
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
-            font-family: 'Cairo', sans-serif;
+            background-color: #000; font-family: 'Cairo', sans-serif;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: white; overflow: hidden;
         }
 
         .header { text-align: center; margin-bottom: 15px; }
-        .header h1 { font-size: 26px; margin: 0; color: #fff; }
-        .header h1 span { color: #00bfff; text-shadow: 0 0 10px #00bfff; }
-        .live-tag { background: red; padding: 2px 12px; border-radius: 4px; font-size: 14px; animation: blink 1s infinite; }
+        .header h1 { font-size: 24px; margin: 0; color: #fff; }
+        .header span { color: #00bfff; }
 
-        /* حاوية المشغل في المنتصف */
-        .player-box {
+        /* المشغل في منتصف الشاشة */
+        .video-container {
             width: 95%; max-width: 800px;
             aspect-ratio: 16 / 9;
+            background: #111;
             border: 2px solid #00bfff;
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 0 30px rgba(0, 191, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.4);
+            position: relative;
         }
 
-        .video-js { width: 100% !important; height: 100% !important; }
+        video { width: 100%; height: 100%; background: #000; }
 
-        @keyframes blink { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
+        /* زر تشغيل في حال لم يعمل تلقائياً */
+        #playBtn {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 12px 25px; background: #00bfff;
+            color: #000; border: none; border-radius: 5px;
+            font-weight: bold; cursor: pointer; z-index: 10;
+        }
+
+        .match-name { margin-top: 10px; font-size: 16px; color: #ff4444; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>عبود <span>#هاشتاق_شاهد</span></h1>
-        <div class="live-tag">مباشر: ريال مدريد × مان سيتي</div>
+        <h1>عبود <span>#هاشتاج_شاهد</span></h1>
+        <div class="match-name">ريال مدريد 🆚 مانشستر سيتي</div>
     </div>
 
-    <div class="player-box">
-        <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" playsinline muted>
-            <source src="https://cors-anywhere.herokuapp.com/https://wjk30.tutor3.site/live/51838_.m3u8?session=fgXV65Um2lfy1XM-PnwCNI6JKBGv-7c8uR6nyqvK0yPD6645oYewQjFQ6kFRCCFO8v9weMjgiE5rg7pCM4ODC3gY8vmYU53y&location=local" type="application/x-mpegURL">
-        </video>
+    <div class="video-container">
+        <button id="playBtn" onclick="startStream()">اضغط لتشغيل البث ⚽</button>
+        <video id="video" controls playsinline></video>
     </div>
 
-    <div style="margin-top: 15px; font-size: 13px; color: #888;">
-        إذا لم يظهر البث، يرجى الضغط على زر التشغيل وتفعيل الصوت
-    </div>
+    <p style="margin-top: 15px; font-size: 12px; color: #555;">حقوق البث محفوظة لـ عبود</p>
 
     <script>
-        var player = videojs('my-video', {
-            autoplay: true,
-            fluid: true,
-            liveui: true
-        });
+        const video = document.getElementById('video');
+        const playBtn = document.getElementById('playBtn');
+        const streamUrl = 'https://wjk30.tutor3.site/live/51838_.m3u8?session=fgXV65Um2lfy1XM-PnwCNI6JKBGv-7c8uR6nyqvK0yPD6645oYewQjFQ6kFRCCFO8v9weMjgiE5rg7pCM4ODC3gY8vmYU53y&location=local';
 
-        // محاولة تشغيل تلقائي
-        player.ready(function() {
-            player.play();
-        });
+        function startStream() {
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(streamUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                    playBtn.style.display = 'none';
+                });
+                
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        alert("عذراً، السيرفر يرفض التشغيل حالياً أو الرابط انتهى.");
+                    }
+                });
+            } 
+            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = streamUrl;
+                video.play();
+                playBtn.style.display = 'none';
+            }
+        }
+
+        // محاولة تشغيل صامت عند التحميل
+        window.onload = () => {
+            video.muted = true;
+            startStream();
+        };
     </script>
 </body>
 </html>
