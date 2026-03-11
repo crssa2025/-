@@ -5,95 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بث مباشر | عبود #هاشتاق_شاهد</title>
     
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
 
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #050505; font-family: 'Cairo', sans-serif;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            font-family: 'Cairo', sans-serif;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: white; overflow: hidden;
         }
 
-        /* اسمك والهاشتاج فوق المشغل */
-        .header-box {
-            text-align: center; margin-bottom: 20px;
-        }
+        .header { text-align: center; margin-bottom: 15px; }
+        .header h1 { font-size: 26px; margin: 0; color: #fff; }
+        .header h1 span { color: #00bfff; text-shadow: 0 0 10px #00bfff; }
+        .live-tag { background: red; padding: 2px 12px; border-radius: 4px; font-size: 14px; animation: blink 1s infinite; }
 
-        .header-box h1 {
-            font-size: 30px; margin: 0; color: #fff;
-        }
-
-        .header-box h1 span {
-            color: #00bfff;
-            text-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
-        }
-
-        .match-status {
-            background: #ff0000; color: white; padding: 4px 15px;
-            border-radius: 5px; font-size: 14px; font-weight: bold;
-            display: inline-block; margin-top: 10px; animation: pulse 1s infinite;
-        }
-
-        /* حاوية المشغل في منتصف الشاشة */
-        #player-wrapper {
-            width: 95%;
-            max-width: 850px;
+        /* حاوية المشغل في المنتصف */
+        .player-box {
+            width: 95%; max-width: 800px;
             aspect-ratio: 16 / 9;
-            border: 3px solid #00bfff;
+            border: 2px solid #00bfff;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 0 30px rgba(0, 191, 255, 0.3);
-            background: #000;
         }
 
-        /* حقوق ثابتة بالأسفل */
-        .footer-text {
-            margin-top: 20px; color: #666; font-size: 15px;
-        }
+        .video-js { width: 100% !important; height: 100% !important; }
 
-        @keyframes pulse { 0% {opacity:1} 50% {opacity:0.5} 100% {opacity:1} }
+        @keyframes blink { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
     </style>
 </head>
 <body>
 
-    <div class="header-box">
+    <div class="header">
         <h1>عبود <span>#هاشتاق_شاهد</span></h1>
-        <div class="match-status">LIVE ريال مدريد × مان سيتي</div>
+        <div class="live-tag">مباشر: ريال مدريد × مان سيتي</div>
     </div>
 
-    <div id="player-wrapper"></div>
+    <div class="player-box">
+        <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" playsinline muted>
+            <source src="https://cors-anywhere.herokuapp.com/https://wjk30.tutor3.site/live/51838_.m3u8?session=fgXV65Um2lfy1XM-PnwCNI6JKBGv-7c8uR6nyqvK0yPD6645oYewQjFQ6kFRCCFO8v9weMjgiE5rg7pCM4ODC3gY8vmYU53y&location=local" type="application/x-mpegURL">
+        </video>
+    </div>
 
-    <div class="footer-text">
-        تصميم الواجهة بواسطة <b>عبود</b>
+    <div style="margin-top: 15px; font-size: 13px; color: #888;">
+        إذا لم يظهر البث، يرجى الضغط على زر التشغيل وتفعيل الصوت
     </div>
 
     <script>
-        // الرابط الذي أكدت أنه شغال
-        const streamUrl = 'https://wjk30.tutor3.site/live/51838_.m3u8?session=fgXV65Um2lfy1XM-PnwCNI6JKBGv-7c8uR6nyqvK0yPD6645oYewQjFQ6kFRCCFO8v9weMjgiE5rg7pCM4ODC3gY8vmYU53y&location=local';
-
-        var player = new Clappr.Player({
-            source: streamUrl,
-            parentId: "#player-wrapper",
-            width: "100%",
-            height: "100%",
-            autoPlay: true,
-            mute: true, // مهم جداً للتشغيل التلقائي
-            actualLiveTime: true,
-            playback: {
-                playInline: true,
-                hlsjsConfig: {
-                    enableWorker: true,
-                }
-            },
-            watermark: "", 
-            position: 'top-right',
+        var player = videojs('my-video', {
+            autoplay: true,
+            fluid: true,
+            liveui: true
         });
 
-        // رسالة تنبيه للمستخدم
-        player.on(Clappr.Events.PLAYER_PLAY, function() {
-            console.log("البث يعمل الآن!");
+        // محاولة تشغيل تلقائي
+        player.ready(function() {
+            player.play();
         });
     </script>
 </body>
