@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ᴛʀᴇɴᴅ ᴇᴍᴘɪʀᴇ | كاشف الكذب الملكي</title>
+    <title>ᴛʀᴇɴᴅ ᴇᴍᴘɪʀᴇ | عجلة الأحكام</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #00f2fe;
-            --danger: #ff4757;
-            --success: #2ed573;
+            --secondary: #4facfe;
+            --accent: #fbc531;
             --dark-bg: #0a0a0b;
+            --card-bg: rgba(15, 15, 15, 0.9);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -20,81 +21,80 @@
             background: var(--dark-bg);
             margin: 0; min-height: 100vh;
             display: flex; justify-content: center; align-items: center;
-            color: white; overflow: hidden;
+            overflow: hidden; color: white;
         }
 
-        /* خلفية تقنية */
         .bg-animate {
             position: fixed; inset: 0; z-index: -1;
             background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
         }
+        .bg-animate::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.3; animation: stars 50s linear infinite;
+        }
+        @keyframes stars { from { background-position: 0 0; } to { background-position: 10000px 5000px; } }
 
-        .container {
-            width: 90%; max-width: 400px; text-align: center; z-index: 10;
+        #overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 5000; display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(25px); transition: 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .welcome-card {
+            background: var(--card-bg); 
+            border: 2px solid rgba(0, 242, 254, 0.5);
+            padding: 40px 30px; border-radius: 40px; text-align: center;
+            width: 90%; max-width: 400px; 
+            box-shadow: 0 0 60px rgba(0, 242, 254, 0.3), inset 0 0 20px rgba(0, 242, 254, 0.1);
+            animation: superEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative; overflow: hidden;
         }
 
-        h1 { font-size: 28px; margin-bottom: 20px; background: linear-gradient(45deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* اختيار الاسم */
-        .name-selector {
-            width: 100%; padding: 15px; border-radius: 15px; background: rgba(255,255,255,0.05);
-            border: 1px solid var(--primary); color: white; font-size: 18px; margin-bottom: 20px;
-            font-family: 'Tajawal'; outline: none;
+        @keyframes superEntrance {
+            0% { transform: scale(0.5) translateY(100px); opacity: 0; filter: blur(20px); }
+            100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
         }
 
-        option { background: #111; color: white; }
-
-        /* منطقة البصمة */
-        .fingerprint-area {
-            position: relative; width: 180px; height: 180px; margin: 30px auto;
-            border: 3px solid var(--primary); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: 0.3s;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+        .main-container {
+            width: 95%; max-width: 450px; text-align: center; z-index: 10;
         }
 
-        .fingerprint-area i { font-size: 80px; opacity: 0.8; }
-
-        /* تأثير المسح (Scanner) */
-        .scanner-bar {
-            position: absolute; width: 100%; height: 4px; background: var(--primary);
-            top: 0; left: 0; border-radius: 10px; box-shadow: 0 0 15px var(--primary);
-            display: none; animation: scan 2s linear infinite;
+        h1 {
+            font-size: 35px; font-weight: 900; margin-bottom: 30px;
+            background: linear-gradient(45deg, #fff, var(--primary), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        @keyframes scan {
-            0% { top: 0; }
-            50% { top: 100%; }
-            100% { top: 0; }
+        .wheel-outer {
+            position: relative; width: 340px; height: 340px; margin: 0 auto 40px;
+            padding: 10px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 0 50px rgba(0, 242, 254, 0.4);
         }
+        .wheel-inner { width: 100%; height: 100%; background: #000; border-radius: 50%; position: relative; overflow: hidden; }
+        canvas { width: 100%; height: 100%; transition: transform 8s cubic-bezier(0.1, 0, 0, 1); }
 
-        .scanning-text { margin-top: 10px; font-size: 14px; color: var(--primary); display: none; }
+        .spin-button {
+            width: 100%; padding: 22px; border-radius: 25px; border: none;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: #000; font-size: 22px; font-weight: 900; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4); transition: 0.3s;
+        }
+        .spin-button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* النتيجة */
         #resultOverlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center;
-            backdrop-filter: blur(10px); animation: fadeIn 0.5s;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            z-index: 6000; display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(12px);
+        }
+        .result-card {
+            background: rgba(15, 15, 15, 0.95); border: 2px solid var(--accent); 
+            padding: 35px 25px; border-radius: 40px; text-align: center; 
+            width: 85%; max-width: 320px; animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .result-box {
-            padding: 40px; border-radius: 30px; text-align: center;
-            width: 80%; border: 2px solid;
-        }
-
-        .status-icon { font-size: 80px; margin-bottom: 20px; }
-        .status-text { font-size: 40px; font-weight: 900; margin-bottom: 10px; }
-        .user-name { font-size: 22px; color: #aaa; margin-bottom: 30px; }
-
-        .btn-retry {
-            padding: 12px 40px; border-radius: 15px; border: none;
-            background: white; color: black; font-weight: 900; cursor: pointer;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* أيقونة البصمة SVG */
-        .fp-svg { width: 100px; fill: var(--primary); }
+        @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
     </style>
 </head>
@@ -102,110 +102,125 @@
 
 <div class="bg-animate"></div>
 
-<div class="container">
-    <h1>جهاز كشف الكذب 🛡️</h1>
-    <p style="color: #888; margin-bottom: 20px;">اختر اسمك وضع بصمتك للاختبار</p>
-
-    <select id="nameList" class="name-selector">
-        <option value="">-- اختر اسم الشخص --</option>
-        </select>
-
-    <div class="fingerprint-area" id="fpArea" onmousedown="startScan()" onmouseup="stopScan()" ontouchstart="startScan()" ontouchend="stopScan()">
-        <div class="scanner-bar" id="scanner"></div>
-        <svg class="fp-svg" viewBox="0 0 512 512">
-            <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm0 472c-119.3 0-216-96.7-216-216S136.7 40 256 40s216 96.7 216 216-96.7 216-216 216z"/>
-            <path d="M256 80c-97.1 0-176 78.9-176 176s78.9 176 176 176 176-78.9 176-176S353.1 80 256 80zm0 312c-75.1 0-136-60.9-136-136s60.9-136 136-136 136 60.9 136 136-60.9 136-136 136z"/>
-            <circle cx="256" cy="256" r="60"/>
-        </svg>
+<div id="overlay">
+    <div class="welcome-card">
+        <h2>جاهزين للأحكام؟ 🔥</h2>
+        <p>الأسماء كلها موجودة.. اللي تطلع عليه العجلة لازم ينفذ الحكم بدون اعتراض! 😉✨</p>
+        <button class="spin-button" style="padding: 18px; font-size: 20px;" onclick="closeWelcome()">ابدأ اللعب الآن 🚀</button>
     </div>
-
-    <div class="scanning-text" id="statusText">جاري مسح البصمة... ثبت إصبعك</div>
-    <p style="margin-top: 40px; font-size: 11px; color: #444;">حقوق الفعالية لـ عبود | </p>
 </div>
 
 <div id="resultOverlay">
-    <div class="result-box" id="resultBox">
-        <div class="status-icon" id="resIcon"></div>
-        <div class="status-text" id="resStatus"></div>
-        <div class="user-name" id="resName"></div>
-        <button class="btn-retry" onclick="resetApp()">محاولة أخرى</button>
+    <div class="result-card">
+        <div style="font-size: 14px; color: var(--primary); letter-spacing: 2px; margin-bottom: 15px;">الضحية المختارة</div>
+        <div style="font-size: 12px; color: #aaa; margin-bottom: 5px;">وقع الاختيار على:</div>
+        <span class="res-name" id="resName" style="font-size: 32px; font-weight: 900; background: linear-gradient(to right, var(--accent), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: block; margin-bottom: 25px;">غير معروف</span>
+        <div style="color: #fff; font-size: 14px; margin-bottom: 25px; border-top: 1px solid rgba(255,255,255,0.1); pt-15px; padding-top: 15px;">
+            يلا بطل.. نفذ الحكم وسوي اللي عليك! 😂⚖️
+        </div>
+        <button style="background: var(--primary); color: black; padding: 12px 40px; border-radius: 15px; font-weight: 900; cursor: pointer; border: none; width: 100%;" onclick="closeResult()">متابعة اللعب</button>
     </div>
+</div>
+
+<div class="main-container">
+    <h1>عجلة أحكام ميرو</h1>
+
+    <div class="wheel-outer">
+        <div class="pointer" style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 40px; z-index: 100;">
+            <svg viewBox="0 0 30 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 40L0 0H30L15 40Z" fill="#fbc531"/>
+            </svg>
+        </div>
+        <div class="wheel-inner">
+            <canvas id="wheel" width="800" height="800"></canvas>
+        </div>
+    </div>
+
+    <button id="spinBtn" class="spin-button" onclick="startSpin()">فرّ العجلة وشوف الضحية 🔥</button>
+    <p style="margin-top: 30px; font-size: 12px; color: #555;">حقوق التصميم محفوظة لـ عبود</p>
 </div>
 
 <script>
     const names = [
-        "وفاء كاظم", "احمد قصي", "مرتضى علي", "بنين جليل", "فاتن توفيق", 
-        "طيبه محمد كامل", "نور عبد الزهره", "امجد وسام", "رانيا عمار", "الحسن بسام", 
-        "بسمه", "ميرو 😅", "رشا احمد 💅🏻", "𝒓𝒆𝒕𝒂𝒈", "إبراهيم", 
-        "نبأ محمد خيري", "زينة محمد سعدي", "شهد طه✨", "عبد الستار طلال علي", "ريهام عمار", 
-        "غدير نجوان 🙈", "تبارك عبود 🌚", "فاطمه علي", "ملاك لؤي🤭", "ايه علي", 
-        "ابرار²", "مريم محمد", "عباس ماجد"
+        "دينا مؤيد", "Adyan", "زين العابدين", "وفاء كاظم", "احمد قصي", 
+        "مرتضى علي", "بنين جليل", "فاتن توفيق", "طيبه محمد كامل", "نور عبد الزهره", 
+        "امجد وسام", "رانيا عمار", "الحسن بسام", "بسمه", "ميرو 😅", 
+        "رشا احمد 💅🏻", "𝒓𝒆𝒕𝒂𝒈", "إبراهيم", "نبأ محمد خيري", "زينة محمد سعدي", 
+        "شهد طه✨", "عبد الستار طلال علي", "ريهام عمار", "غدير نجوان 🙈", "تبارك عبود 🌚", 
+        "فاطمه علي", "ملاك لؤي🤭", "ايه علي", "ابرار²", "مريم محمد", "عباس ماجد"
     ];
 
-    const select = document.getElementById('nameList');
-    names.sort().forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        select.appendChild(opt);
-    });
+    let usedNames = [];
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const center = 400;
+    const sliceAngle = (2 * Math.PI) / names.length;
+    let currentRotation = 0;
 
-    let scanTimeout;
+    function draw() {
+        names.forEach((name, i) => {
+            const angle = i * sliceAngle;
+            ctx.beginPath();
+            ctx.fillStyle = i % 2 === 0 ? '#0a0a0a' : '#1a1a1a'; 
+            ctx.moveTo(center, center);
+            ctx.arc(center, center, center, angle, angle + sliceAngle);
+            ctx.fill();
 
-    function startScan() {
-        const name = select.value;
-        if(!name) {
-            alert("يرجى اختيار الاسم أولاً!");
-            return;
+            ctx.save();
+            ctx.translate(center, center);
+            ctx.rotate(angle + sliceAngle / 2);
+            ctx.textAlign = "right";
+            ctx.fillStyle = i % 2 === 0 ? "#00f2fe" : "#ffffff";
+            // تم تصغير الخط قليلاً ليتناسب مع زيادة عدد الأسماء
+            ctx.font = "bold 16px Tajawal";
+            ctx.fillText(name, center - 40, 10);
+            ctx.restore();
+        });
+        ctx.beginPath();
+        ctx.arc(center, center, 20, 0, Math.PI * 2);
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+    }
+    draw();
+
+    function closeWelcome() {
+        const overlay = document.getElementById('overlay');
+        overlay.style.transform = 'translateY(-100%) scale(1.2)';
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.style.display = 'none', 1000);
+    }
+
+    function startSpin() {
+        const btn = document.getElementById('spinBtn');
+        btn.disabled = true;
+
+        if (usedNames.length === names.length) {
+            usedNames = [];
         }
+
+        let availableNames = names.filter(n => !usedNames.includes(n));
+        let selectedName = availableNames[Math.floor(Math.random() * availableNames.length)];
+        usedNames.push(selectedName);
+
+        const nameIndex = names.indexOf(selectedName);
+        const sectionDeg = 360 / names.length;
         
-        document.getElementById('scanner').style.display = 'block';
-        document.getElementById('statusText').style.display = 'block';
-        document.getElementById('fpArea').style.transform = 'scale(0.95)';
+        const stopAngle = 360 - (nameIndex * sectionDeg) - (sectionDeg / 2) - 90;
+        const extraSpins = (Math.floor(Math.random() * 5) + 10) * 360; 
         
-        // التحليل يستغرق 3 ثواني
-        scanTimeout = setTimeout(showResult, 3000);
+        currentRotation += extraSpins + (stopAngle - (currentRotation % 360) + 360) % 360;
+
+        canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+        setTimeout(() => {
+            btn.disabled = false;
+            document.getElementById('resName').innerText = selectedName;
+            document.getElementById('resultOverlay').style.display = 'flex';
+        }, 8500);
     }
 
-    function stopScan() {
-        clearTimeout(scanTimeout);
-        document.getElementById('scanner').style.display = 'none';
-        document.getElementById('statusText').style.display = 'none';
-        document.getElementById('fpArea').style.transform = 'scale(1)';
-    }
-
-    function showResult() {
-        const name = select.value;
-        const isTrue = Math.random() > 0.5; // اختيار عشوائي بين صادق وكاذب
-        
-        const overlay = document.getElementById('resultOverlay');
-        const box = document.getElementById('resultBox');
-        const icon = document.getElementById('resIcon');
-        const status = document.getElementById('resStatus');
-        const resName = document.getElementById('resName');
-
-        resName.innerText = name;
-        overlay.style.display = 'flex';
-
-        if(isTrue) {
-            box.style.borderColor = "var(--success)";
-            box.style.boxShadow = "0 0 30px rgba(46, 213, 115, 0.3)";
-            icon.innerText = "✅";
-            status.innerText = "صـادق";
-            status.style.color = "var(--success)";
-        } else {
-            box.style.borderColor = "var(--danger)";
-            box.style.boxShadow = "0 0 30px rgba(255, 71, 87, 0.3)";
-            icon.innerText = "❌";
-            status.innerText = "كـاذب";
-            status.style.color = "var(--danger)";
-        }
-    }
-
-    function resetApp() {
-        document.getElementById('resultOverlay').style.display = 'none';
-        select.value = "";
-        stopScan();
+    function closeResult() { 
+        document.getElementById('resultOverlay').style.display = 'none'; 
     }
 </script>
 
